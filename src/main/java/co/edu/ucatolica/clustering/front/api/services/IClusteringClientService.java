@@ -1,4 +1,4 @@
-package co.edu.ucatolica.clustering.front.api.controller.service;
+package co.edu.ucatolica.clustering.front.api.services;
 
 import org.springframework.http.ResponseEntity;
 
@@ -12,7 +12,7 @@ public interface IClusteringClientService {
 	
 	public ResponseEntity<AbstractClusteringMethodResponse> getClusteringResult(String executionId);
 	
-	public ResponseEntity<ClusteringMethods> getClusteringMethodConfigurations();
+	public ResponseEntity<Object[]> getClusteringMethodConfigurations();
 	
 	public ResponseEntity<String> checkClusteringExec(String executionId);
 

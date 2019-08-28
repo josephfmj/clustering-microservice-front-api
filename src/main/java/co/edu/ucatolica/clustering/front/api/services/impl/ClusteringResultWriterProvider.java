@@ -1,4 +1,4 @@
-package co.edu.ucatolica.clustering.front.api.controller.service.impl;
+package co.edu.ucatolica.clustering.front.api.services.impl;
 
 import java.util.HashMap;
 import java.util.List;
@@ -7,8 +7,8 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import co.edu.ucatolica.clustering.front.api.controller.service.IClusteringResultWriter;
-import co.edu.ucatolica.clustering.front.api.controller.service.IClusteringResultWriterProvider;
+import co.edu.ucatolica.clustering.front.api.services.IClusteringResultWriter;
+import co.edu.ucatolica.clustering.front.api.services.IClusteringResultWriterProvider;
 
 @Service
 public class ClusteringResultWriterProvider implements IClusteringResultWriterProvider {

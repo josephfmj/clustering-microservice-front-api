@@ -1,4 +1,4 @@
-package co.edu.ucatolica.clustering.front.api.controller;
+package co.edu.ucatolica.clustering.front.api.controllers;
 
 import java.util.Optional;
 
@@ -8,20 +8,16 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import co.edu.ucatolica.clustering.front.api.controller.service.ICSVSendFileService;
-import co.edu.ucatolica.clustering.front.api.controller.service.IDownLoadFileService;
+import co.edu.ucatolica.clustering.front.api.services.ICSVSendFileService;
+import co.edu.ucatolica.clustering.front.api.services.IDownLoadFileService;
 import co.edu.ucatolica.clustering.front.api.model.ApiClusteringExecutionRequest;
 import co.edu.ucatolica.clustering.front.api.model.ClusteringResponseFile;
 
-@RestController("/data")
+@RestController
+@RequestMapping("/data")
 public class ClusteringLoadDataController {
 	
 	@Autowired
@@ -31,8 +27,8 @@ public class ClusteringLoadDataController {
 	private ICSVSendFileService sendFileService;
 
 	@RequestMapping(method = RequestMethod.POST, value = "/upload")
-	public ResponseEntity<String> sendClusteringData(@RequestBody ApiClusteringExecutionRequest methodData,
-			@RequestParam("csvFile") MultipartFile csvFile) {
+	public ResponseEntity<String> sendClusteringData(@RequestPart(name = "clusteringData") ApiClusteringExecutionRequest methodData,
+			@RequestPart("csvFile") MultipartFile csvFile) {
 
 		Optional<String> result = sendFileService
 				.prepareData(methodData, csvFile)
@@ -43,7 +39,7 @@ public class ClusteringLoadDataController {
 
 	}
 	
-	@RequestMapping(method = RequestMethod.POST, value = "/download/{Id}")
+	@RequestMapping(method = RequestMethod.GET, value = "/download/{Id}")
 	public ResponseEntity<Resource> downLoadClusteringExec(@PathVariable("Id") String executionId) {
 		
 		final Optional<ClusteringResponseFile> result = downLoadFileService

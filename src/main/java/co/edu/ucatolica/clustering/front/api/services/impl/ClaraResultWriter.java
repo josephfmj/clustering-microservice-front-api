@@ -1,7 +1,9 @@
-package co.edu.ucatolica.clustering.front.api.controller.service.impl;
+package co.edu.ucatolica.clustering.front.api.services.impl;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,16 +14,16 @@ import org.springframework.stereotype.Service;
 
 import co.edu.ucatolica.clustering.front.api.constant.ClusteringMethodNames;
 import co.edu.ucatolica.clustering.front.api.constant.ClusteringMethodsConstants;
-import co.edu.ucatolica.clustering.front.api.controller.service.IClusteringResultWriter;
-import co.edu.ucatolica.clustering.front.api.controller.service.ICreateResponseFileFacade;
+import co.edu.ucatolica.clustering.front.api.services.IClusteringResultWriter;
+import co.edu.ucatolica.clustering.front.api.services.ICreateResponseFileFacade;
 import co.edu.ucatolica.clustering.front.api.model.AbstractClusteringMethodResponse;
-import co.edu.ucatolica.clustering.front.api.model.DianaResponse;
+import co.edu.ucatolica.clustering.front.api.model.ClaraResponse;
 import co.edu.ucatolica.clustering.front.api.util.MapRecordsUtil;
 
-@Service(ClusteringMethodNames.DIANA)
-public class DianaResultWriter implements IClusteringResultWriter {
-
-	private static Logger LOGGER = LoggerFactory.getLogger(DianaResultWriter.class);
+@Service(ClusteringMethodNames.CLARA)
+public class ClaraResultWriter implements IClusteringResultWriter {
+	
+	private static Logger LOGGER = LoggerFactory.getLogger(ClaraResultWriter.class);
 	
 	private ICreateResponseFileFacade createResponseFile;
 	
@@ -29,20 +31,25 @@ public class DianaResultWriter implements IClusteringResultWriter {
 	
 	private String filesCharset;
 	
+	private List<String> medoidHeaders;
+	
+	private List<List<String>> medoidRecords;
+	
 	private List<String> clusterHeaders;
 	
 	private List<List<String>> clusterRecords;
 	
-	private DianaResponse dianaResponse;
+	private ClaraResponse claraResponse;
 	
 	@Autowired
-	public DianaResultWriter(ICreateResponseFileFacade createResponseFile,
+	public ClaraResultWriter(ICreateResponseFileFacade createResponseFile,
 			@Value("${clustering.service.charset-response-file}") String csvDelimiter,
 			@Value("${clustering.service.charset-response-file}") String filesCharset) {
 		
 		this.csvDelimiter = csvDelimiter;
 		this.filesCharset = filesCharset;
 		this.createResponseFile = createResponseFile; 
+		this.medoidRecords = new ArrayList<>();
 		String clusterRowNames[] = ClusteringMethodsConstants
 				.CLUSTER_RESULT_DEFAULT_COLUMN_NAMES
 				.getValue()
@@ -50,23 +57,30 @@ public class DianaResultWriter implements IClusteringResultWriter {
 		this.clusterHeaders = Arrays.asList(clusterRowNames);
 		
 	}
-	
+
 	@Override
 	public String getServiceName() {
 		
-		return ClusteringMethodNames.DIANA.toUpperCase();
+		return ClusteringMethodNames.CLARA.toUpperCase();
 	}
 
 	@Override
 	public IClusteringResultWriter readClusteringResponse(AbstractClusteringMethodResponse response) {
 		
-		LOGGER.info("leyendo objeto DianaResponse");
+		LOGGER.info("leyendo objeto ClaraResponse");
 		
-		this.dianaResponse = (DianaResponse) response;
+		this.claraResponse = (ClaraResponse) response;
+		
+		this.medoidHeaders = MapRecordsUtil
+				.getHeaderFromMap(claraResponse.getResult().getMedoids().get(0));
+		
+		this.claraResponse
+		.getResult()
+		.getMedoids()
+		.forEach(this::getMedoidRecord);
 		
 		this.clusterRecords = MapRecordsUtil
-				.mapRecordToRecordList(dianaResponse.getResult().getClusters());
-		
+				.mapRecordToRecordList(claraResponse.getResult().getClusters());
 		return this;
 	}
 
@@ -75,8 +89,10 @@ public class DianaResultWriter implements IClusteringResultWriter {
 		
 		this.createResponseFile
 		.prepare(csvDelimiter, filesCharset)
-		.writeCSVFile(clusterHeaders,clusterRecords)
-		.attachToZipFile(ClusteringMethodsConstants.DIANA_CLUSTERS_CSV_FILE_NAME);
+		.writeCSVFile(medoidHeaders, medoidRecords)
+		.attachToZipFile(ClusteringMethodsConstants.CLARA_MEDOIDS_CSV_FILE_NAME)
+		.writeCSVFile(clusterHeaders, clusterRecords)
+		.attachToZipFile(ClusteringMethodsConstants.CLARA_CLUSTERS_CSV_FILE_NAME);
 		
 		return this;
 	}
@@ -87,4 +103,11 @@ public class DianaResultWriter implements IClusteringResultWriter {
 		return this.createResponseFile
 				.getResponseFile();
 	}
+	
+	private void getMedoidRecord(Map<String, String> mapRecord) {
+		
+		this.medoidRecords
+		.add(MapRecordsUtil.getRecordFromMap(mapRecord, this.medoidHeaders));
+	}
+
 }

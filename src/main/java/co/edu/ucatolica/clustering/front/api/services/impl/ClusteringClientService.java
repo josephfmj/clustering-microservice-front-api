@@ -1,5 +1,6 @@
-package co.edu.ucatolica.clustering.front.api.controller.service.impl;
+package co.edu.ucatolica.clustering.front.api.services.impl;
 
+import co.edu.ucatolica.clustering.front.api.model.ClusterMethodConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
@@ -7,10 +8,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
-import co.edu.ucatolica.clustering.front.api.controller.service.IClusteringClientService;
+import co.edu.ucatolica.clustering.front.api.services.IClusteringClientService;
 import co.edu.ucatolica.clustering.front.api.model.AbstractClusteringMethodResponse;
 import co.edu.ucatolica.clustering.front.api.model.ClusteringExecutionRequest;
 import co.edu.ucatolica.clustering.front.api.model.ClusteringMethods;
+
+import java.util.List;
 
 @Service
 public class ClusteringClientService implements IClusteringClientService {
@@ -60,11 +63,11 @@ public class ClusteringClientService implements IClusteringClientService {
 	}
 	
 	@Override
-	public ResponseEntity<ClusteringMethods> getClusteringMethodConfigurations() {
+	public ResponseEntity<Object[]> getClusteringMethodConfigurations() {
 		
 		final String uriService = buildServiceUri(clusteringServiceHost,clusteringServiceConfigurationUri);
-		
-		return client.getForEntity(uriService, ClusteringMethods.class);
+
+		return client.getForEntity(uriService,Object[].class);
 	}
 	
 	@Override

@@ -1,4 +1,4 @@
-package co.edu.ucatolica.clustering.front.api.controller.service.impl;
+package co.edu.ucatolica.clustering.front.api.services.impl;
 
 import java.util.List;
 
@@ -9,7 +9,7 @@ import org.springframework.core.io.InputStreamResource;
 import org.springframework.stereotype.Service;
 
 import co.edu.ucatolica.clustering.front.api.constant.ClusteringMethodsConstants;
-import co.edu.ucatolica.clustering.front.api.controller.service.ICreateResponseFileFacade;
+import co.edu.ucatolica.clustering.front.api.services.ICreateResponseFileFacade;
 import co.edu.ucatolica.clustering.front.api.util.ICSVPrinterUtil;
 import co.edu.ucatolica.clustering.front.api.util.IZipFileUtil;
 

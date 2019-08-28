@@ -1,4 +1,4 @@
-package co.edu.ucatolica.clustering.front.api.controller.service.impl;
+package co.edu.ucatolica.clustering.front.api.services.impl;
 
 import java.util.Optional;
 
@@ -10,9 +10,9 @@ import org.springframework.stereotype.Service;
 
 import co.edu.ucatolica.clustering.front.api.constant.ClusteringMethodNames;
 import co.edu.ucatolica.clustering.front.api.constant.ClusteringMethodsConstants;
-import co.edu.ucatolica.clustering.front.api.controller.service.IClusteringClientService;
-import co.edu.ucatolica.clustering.front.api.controller.service.IClusteringResultWriterProvider;
-import co.edu.ucatolica.clustering.front.api.controller.service.IDownLoadFileService;
+import co.edu.ucatolica.clustering.front.api.services.IClusteringClientService;
+import co.edu.ucatolica.clustering.front.api.services.IClusteringResultWriterProvider;
+import co.edu.ucatolica.clustering.front.api.services.IDownLoadFileService;
 import co.edu.ucatolica.clustering.front.api.model.AbstractClusteringMethodResponse;
 import co.edu.ucatolica.clustering.front.api.model.ClusteringResponseFile;
 

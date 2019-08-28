@@ -1,4 +1,4 @@
-package co.edu.ucatolica.clustering.front.api.controller.service.impl;
+package co.edu.ucatolica.clustering.front.api.services.impl;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -13,7 +13,7 @@ import org.apache.commons.csv.CSVRecord;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import co.edu.ucatolica.clustering.front.api.controller.service.ICSVReaderService;
+import co.edu.ucatolica.clustering.front.api.services.ICSVReaderService;
 
 @Service
 public class CSVReaderServiceImpl implements ICSVReaderService {

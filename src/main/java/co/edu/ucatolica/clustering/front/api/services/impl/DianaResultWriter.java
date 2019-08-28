@@ -1,4 +1,4 @@
-package co.edu.ucatolica.clustering.front.api.controller.service.impl;
+package co.edu.ucatolica.clustering.front.api.services.impl;
 
 import java.util.Arrays;
 import java.util.List;
@@ -12,16 +12,16 @@ import org.springframework.stereotype.Service;
 
 import co.edu.ucatolica.clustering.front.api.constant.ClusteringMethodNames;
 import co.edu.ucatolica.clustering.front.api.constant.ClusteringMethodsConstants;
-import co.edu.ucatolica.clustering.front.api.controller.service.IClusteringResultWriter;
-import co.edu.ucatolica.clustering.front.api.controller.service.ICreateResponseFileFacade;
+import co.edu.ucatolica.clustering.front.api.services.IClusteringResultWriter;
+import co.edu.ucatolica.clustering.front.api.services.ICreateResponseFileFacade;
 import co.edu.ucatolica.clustering.front.api.model.AbstractClusteringMethodResponse;
-import co.edu.ucatolica.clustering.front.api.model.PamResponse;
+import co.edu.ucatolica.clustering.front.api.model.DianaResponse;
 import co.edu.ucatolica.clustering.front.api.util.MapRecordsUtil;
 
-@Service(ClusteringMethodNames.PAM)
-public class PamResultWriter implements IClusteringResultWriter{
-	
-	private static Logger LOGGER = LoggerFactory.getLogger(PamResultWriter.class);
+@Service(ClusteringMethodNames.DIANA)
+public class DianaResultWriter implements IClusteringResultWriter {
+
+	private static Logger LOGGER = LoggerFactory.getLogger(DianaResultWriter.class);
 	
 	private ICreateResponseFileFacade createResponseFile;
 	
@@ -33,14 +33,10 @@ public class PamResultWriter implements IClusteringResultWriter{
 	
 	private List<List<String>> clusterRecords;
 	
-	private List<String> medoidHeader;
-	
-	private List<List<String>> medoidRecord;
-	
-	private PamResponse pamResponse;
+	private DianaResponse dianaResponse;
 	
 	@Autowired
-	public PamResultWriter(ICreateResponseFileFacade createResponseFile,
+	public DianaResultWriter(ICreateResponseFileFacade createResponseFile,
 			@Value("${clustering.service.charset-response-file}") String csvDelimiter,
 			@Value("${clustering.service.charset-response-file}") String filesCharset) {
 		
@@ -52,26 +48,24 @@ public class PamResultWriter implements IClusteringResultWriter{
 				.getValue()
 				.split(this.csvDelimiter);
 		this.clusterHeaders = Arrays.asList(clusterRowNames);
+		
 	}
-
+	
 	@Override
 	public String getServiceName() {
 		
-		return ClusteringMethodNames.PAM.toUpperCase();
+		return ClusteringMethodNames.DIANA.toUpperCase();
 	}
 
 	@Override
 	public IClusteringResultWriter readClusteringResponse(AbstractClusteringMethodResponse response) {
 		
-		LOGGER.info("leyendo objeto PamResponse");
+		LOGGER.info("leyendo objeto DianaResponse");
 		
-		this.pamResponse = (PamResponse) response;		
-		String medoidColumnName[] = {ClusteringMethodsConstants.PAM_MEDOIDS_COLUMN_NAME.getValue()};
-		this.medoidHeader = Arrays.asList(medoidColumnName);		
-		this.medoidRecord = MapRecordsUtil
-				.listToRecordList(pamResponse.getResult().getMedoids());		
+		this.dianaResponse = (DianaResponse) response;
+		
 		this.clusterRecords = MapRecordsUtil
-				.mapRecordToRecordList(pamResponse.getResult().getClusters());
+				.mapRecordToRecordList(dianaResponse.getResult().getClusters());
 		
 		return this;
 	}
@@ -82,9 +76,7 @@ public class PamResultWriter implements IClusteringResultWriter{
 		this.createResponseFile
 		.prepare(csvDelimiter, filesCharset)
 		.writeCSVFile(clusterHeaders,clusterRecords)
-		.attachToZipFile(ClusteringMethodsConstants.PAM_CLUSTERS_CSV_FILE_NAME)
-		.writeCSVFile(medoidHeader,medoidRecord)
-		.attachToZipFile(ClusteringMethodsConstants.PAM_MEDOIDS_CSV_FILE_NAME);
+		.attachToZipFile(ClusteringMethodsConstants.DIANA_CLUSTERS_CSV_FILE_NAME);
 		
 		return this;
 	}
@@ -95,5 +87,4 @@ public class PamResultWriter implements IClusteringResultWriter{
 		return this.createResponseFile
 				.getResponseFile();
 	}
-
 }

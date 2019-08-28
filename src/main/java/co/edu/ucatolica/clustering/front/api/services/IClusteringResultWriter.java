@@ -1,4 +1,4 @@
-package co.edu.ucatolica.clustering.front.api.controller.service;
+package co.edu.ucatolica.clustering.front.api.services;
 
 import org.springframework.core.io.InputStreamResource;
 

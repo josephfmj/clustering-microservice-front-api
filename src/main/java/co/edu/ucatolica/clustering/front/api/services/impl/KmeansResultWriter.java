@@ -1,4 +1,4 @@
-package co.edu.ucatolica.clustering.front.api.controller.service.impl;
+package co.edu.ucatolica.clustering.front.api.services.impl;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -14,16 +14,16 @@ import org.springframework.stereotype.Service;
 
 import co.edu.ucatolica.clustering.front.api.constant.ClusteringMethodNames;
 import co.edu.ucatolica.clustering.front.api.constant.ClusteringMethodsConstants;
-import co.edu.ucatolica.clustering.front.api.controller.service.IClusteringResultWriter;
-import co.edu.ucatolica.clustering.front.api.controller.service.ICreateResponseFileFacade;
+import co.edu.ucatolica.clustering.front.api.services.IClusteringResultWriter;
+import co.edu.ucatolica.clustering.front.api.services.ICreateResponseFileFacade;
 import co.edu.ucatolica.clustering.front.api.model.AbstractClusteringMethodResponse;
-import co.edu.ucatolica.clustering.front.api.model.ClaraResponse;
+import co.edu.ucatolica.clustering.front.api.model.KmeansResponse;
 import co.edu.ucatolica.clustering.front.api.util.MapRecordsUtil;
 
-@Service(ClusteringMethodNames.CLARA)
-public class ClaraResultWriter implements IClusteringResultWriter {
+@Service(ClusteringMethodNames.KMEANS)
+public class KmeansResultWriter implements IClusteringResultWriter {
 	
-	private static Logger LOGGER = LoggerFactory.getLogger(ClaraResultWriter.class);
+	private static Logger LOGGER = LoggerFactory.getLogger(KmeansResultWriter.class);
 	
 	private ICreateResponseFileFacade createResponseFile;
 	
@@ -31,68 +31,69 @@ public class ClaraResultWriter implements IClusteringResultWriter {
 	
 	private String filesCharset;
 	
-	private List<String> medoidHeaders;
-	
-	private List<List<String>> medoidRecords;
+	private List<String> centerHeaders;
 	
 	private List<String> clusterHeaders;
 	
+	private List<List<String>> centerRecords;
+	
 	private List<List<String>> clusterRecords;
 	
-	private ClaraResponse claraResponse;
+	private KmeansResponse kmeansResponse;
 	
 	@Autowired
-	public ClaraResultWriter(ICreateResponseFileFacade createResponseFile,
+	public KmeansResultWriter(ICreateResponseFileFacade createResponseFile,
 			@Value("${clustering.service.charset-response-file}") String csvDelimiter,
 			@Value("${clustering.service.charset-response-file}") String filesCharset) {
 		
 		this.csvDelimiter = csvDelimiter;
 		this.filesCharset = filesCharset;
 		this.createResponseFile = createResponseFile; 
-		this.medoidRecords = new ArrayList<>();
+		this.centerRecords = new ArrayList<>();
 		String clusterRowNames[] = ClusteringMethodsConstants
 				.CLUSTER_RESULT_DEFAULT_COLUMN_NAMES
 				.getValue()
 				.split(this.csvDelimiter);
 		this.clusterHeaders = Arrays.asList(clusterRowNames);
-		
 	}
-
+	
 	@Override
 	public String getServiceName() {
 		
-		return ClusteringMethodNames.CLARA.toUpperCase();
+		return ClusteringMethodNames.KMEANS.toUpperCase();
 	}
-
+	
 	@Override
 	public IClusteringResultWriter readClusteringResponse(AbstractClusteringMethodResponse response) {
 		
-		LOGGER.info("leyendo objeto ClaraResponse");
+		LOGGER.info("leyendo objeto KmeansResponse");
 		
-		this.claraResponse = (ClaraResponse) response;
+		this.kmeansResponse = (KmeansResponse) response;
 		
-		this.medoidHeaders = MapRecordsUtil
-				.getHeaderFromMap(claraResponse.getResult().getMedoids().get(0));
+		this.centerHeaders = MapRecordsUtil
+				.getHeaderFromMap(kmeansResponse.getResult().getCenters().get(0));
 		
-		this.claraResponse
+		this.kmeansResponse
 		.getResult()
-		.getMedoids()
-		.forEach(this::getMedoidRecord);
+		.getCenters()
+		.forEach(this::getCenterRecord);
 		
 		this.clusterRecords = MapRecordsUtil
-				.mapRecordToRecordList(claraResponse.getResult().getClusters());
+				.mapRecordToRecordList(kmeansResponse.getResult().getClusters());		
+		
 		return this;
+		
 	}
-
+	
 	@Override
 	public IClusteringResultWriter writeRecords() {
 		
 		this.createResponseFile
 		.prepare(csvDelimiter, filesCharset)
-		.writeCSVFile(medoidHeaders, medoidRecords)
-		.attachToZipFile(ClusteringMethodsConstants.CLARA_MEDOIDS_CSV_FILE_NAME)
+		.writeCSVFile(centerHeaders,centerRecords)
+		.attachToZipFile(ClusteringMethodsConstants.KMEANS_CENTERS_CSV_FILE_NAME)
 		.writeCSVFile(clusterHeaders, clusterRecords)
-		.attachToZipFile(ClusteringMethodsConstants.CLARA_CLUSTERS_CSV_FILE_NAME);
+		.attachToZipFile(ClusteringMethodsConstants.KMEANS_CLUSTERS_CSV_FILE_NAME);
 		
 		return this;
 	}
@@ -102,12 +103,13 @@ public class ClaraResultWriter implements IClusteringResultWriter {
 		
 		return this.createResponseFile
 				.getResponseFile();
+		
 	}
 	
-	private void getMedoidRecord(Map<String, String> mapRecord) {
+	private void getCenterRecord(Map<String, String> mapRecord) {
 		
-		this.medoidRecords
-		.add(MapRecordsUtil.getRecordFromMap(mapRecord, this.medoidHeaders));
+		this.centerRecords
+		.add(MapRecordsUtil.getRecordFromMap(mapRecord, this.centerHeaders));
 	}
 
 }

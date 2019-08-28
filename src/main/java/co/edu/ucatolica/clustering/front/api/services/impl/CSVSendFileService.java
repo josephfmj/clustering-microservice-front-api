@@ -1,4 +1,4 @@
-package co.edu.ucatolica.clustering.front.api.controller.service.impl;
+package co.edu.ucatolica.clustering.front.api.services.impl;
 
 import java.util.List;
 import java.util.Map;
@@ -8,9 +8,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import co.edu.ucatolica.clustering.front.api.controller.service.ICSVReaderService;
-import co.edu.ucatolica.clustering.front.api.controller.service.ICSVSendFileService;
-import co.edu.ucatolica.clustering.front.api.controller.service.IClusteringClientService;
+import co.edu.ucatolica.clustering.front.api.services.ICSVReaderService;
+import co.edu.ucatolica.clustering.front.api.services.ICSVSendFileService;
+import co.edu.ucatolica.clustering.front.api.services.IClusteringClientService;
 import co.edu.ucatolica.clustering.front.api.model.ApiClusteringExecutionRequest;
 import co.edu.ucatolica.clustering.front.api.model.ClusteringExecutionRequest;
 
