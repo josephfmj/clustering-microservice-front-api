@@ -18,13 +18,13 @@ import co.edu.ucatolica.clustering.front.api.services.ICSVReaderService;
 @Service
 public class CSVReaderServiceImpl implements ICSVReaderService {
 	
-	private  boolean csvRecordEmpty;
+	private List<CSVRecord> csvRecords;
 	
 	private List<String> columns;
 	
 	private Map<String, List<String>> mapRecords;
 	
-	private CSVParser csvRecords;
+	private CSVParser csvParser;
 	
 	public CSVReaderServiceImpl() {
 		
@@ -36,16 +36,16 @@ public class CSVReaderServiceImpl implements ICSVReaderService {
 	public ICSVReaderService prepareDataToRead(MultipartFile csvFile) {
 		
 		try(
-		
+
 			CSVParser csvRecords = CSVFormat
 			.EXCEL
 			.withFirstRecordAsHeader()
 			.parse(new InputStreamReader(csvFile.getInputStream()));
 		
 		) {
-			this.csvRecords = csvRecords;
-			this.csvRecordEmpty = this.csvRecords.getRecords().isEmpty();
-			this.columns = new ArrayList<>(this.csvRecords.getHeaderMap().keySet());
+			this.csvParser = csvRecords;
+			this.csvRecords = this.csvParser.getRecords();
+			this.columns = new ArrayList<>(this.csvParser.getHeaderMap().keySet());
 			
 		} catch (IOException e) {
 			
@@ -58,7 +58,7 @@ public class CSVReaderServiceImpl implements ICSVReaderService {
 	@Override
 	public ICSVReaderService prepareMapRecord() {
 		
-		if(this.columns.isEmpty() || this.csvRecordEmpty) {
+		if(this.columns.isEmpty() || this.csvRecords.isEmpty()) {
 			throw new IllegalArgumentException("El csv no tiene un formato valido o esta vacio");
 		}
 		
@@ -70,16 +70,16 @@ public class CSVReaderServiceImpl implements ICSVReaderService {
 
 	@Override
 	public Map<String, List<String>> readCSVToMap() {
-		
-		this.csvRecords
-		.forEach(this::processRecord);
-		
+
+		this.csvRecords.forEach(this::processRecord);
+
 		return this.mapRecords;
 	}
 	
 	private void processRecord(CSVRecord csvRecord) {
 		this.columns
 		.forEach(column -> this.mapRecords.get(column).add(csvRecord.get(column)));
+
 	}
 
 }

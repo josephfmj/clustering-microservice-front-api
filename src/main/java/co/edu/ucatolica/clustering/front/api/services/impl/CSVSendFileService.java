@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import co.edu.ucatolica.clustering.front.api.model.UploadResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -57,10 +58,15 @@ public class CSVSendFileService implements ICSVSendFileService{
 	}
 
 	@Override
-	public Optional<String> getResponse() {
-		
+	public Optional<UploadResult> getResponse() {
+		UploadResult response = new UploadResult();
+
 		return Optional
-		.ofNullable(clusteringService.sendToExecClustering(clusteringRequest).getBody());
+		.ofNullable(clusteringService.sendToExecClustering(clusteringRequest).getBody())
+				.map(data -> {
+					response.setExecutionId(data);
+					return response;
+				});
 		
 	}
 

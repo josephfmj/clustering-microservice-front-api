@@ -2,6 +2,7 @@ package co.edu.ucatolica.clustering.front.api.controllers;
 
 import java.util.Optional;
 
+import co.edu.ucatolica.clustering.front.api.model.UploadResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
@@ -16,6 +17,7 @@ import co.edu.ucatolica.clustering.front.api.services.IDownLoadFileService;
 import co.edu.ucatolica.clustering.front.api.model.ApiClusteringExecutionRequest;
 import co.edu.ucatolica.clustering.front.api.model.ClusteringResponseFile;
 
+@CrossOrigin(origins = "http://localhost:4200", maxAge = 3600)
 @RestController
 @RequestMapping("/data")
 public class ClusteringLoadDataController {
@@ -26,11 +28,11 @@ public class ClusteringLoadDataController {
 	@Autowired
 	private ICSVSendFileService sendFileService;
 
-	@RequestMapping(method = RequestMethod.POST, value = "/upload")
-	public ResponseEntity<String> sendClusteringData(@RequestPart(name = "clusteringData") ApiClusteringExecutionRequest methodData,
-			@RequestPart("csvFile") MultipartFile csvFile) {
+	@RequestMapping(method = RequestMethod.POST, value = "/upload",  consumes = { MediaType.MULTIPART_FORM_DATA_VALUE }, produces = { MediaType.APPLICATION_JSON_VALUE })
+	public ResponseEntity<UploadResult> sendClusteringData(@RequestPart(name = "clusteringData") ApiClusteringExecutionRequest methodData,
+														   @RequestPart("csvFile") MultipartFile csvFile) {
 
-		Optional<String> result = sendFileService
+		Optional<UploadResult> result = sendFileService
 				.prepareData(methodData, csvFile)
 				.readFile()
 				.getResponse();
@@ -49,10 +51,10 @@ public class ClusteringLoadDataController {
 
 	}
 	
-	private ResponseEntity<String> buildResponseEntity(HttpStatus badStatus,
-			Optional<String> result){
+	private ResponseEntity<UploadResult> buildResponseEntity(HttpStatus badStatus,
+			Optional<UploadResult> result){
 				
-		return result.isPresent() ? new ResponseEntity<String>(result.get(), HttpStatus.OK) :
+		return result.isPresent() ? new ResponseEntity<UploadResult>(result.get(), HttpStatus.OK) :
 			new ResponseEntity<>(badStatus);
 	}
 		

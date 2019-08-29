@@ -4,8 +4,11 @@ import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
+import com.fasterxml.jackson.core.JsonFactory;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.ObjectUtils;
 
 import com.fasterxml.jackson.core.JsonParser;
@@ -46,16 +49,19 @@ public class ClusteringResponseDeserializer extends JsonDeserializer<AbstractClu
 		ObjectCodec oc = jp.getCodec();
 		JsonNode node = oc.readTree(jp);
 		
-		final AbstractClusteringMethodResponse response = getMethodResult(oc, node);
+		final AbstractClusteringMethodResponse response = getMethodResult(node);
 		completeMethodData(response,oc,node);
 		
 		return response;
 	    
 	}
   
-	private AbstractClusteringMethodResponse getMethodResult(ObjectCodec oc, JsonNode node) throws IOException {
-	  
-		JsonParser resultParser = node.get("result").traverse();		
+	private AbstractClusteringMethodResponse getMethodResult(JsonNode node) throws IOException {
+		ObjectMapper mapper = new ObjectMapper();
+		mapper.configure(JsonParser.Feature.AUTO_CLOSE_SOURCE, true);
+		String partialResult = node.get("executionData").get("result").get("description").asText().replaceAll("\n","");
+		JsonNode partialNode = mapper.readValue(partialResult, JsonNode.class);
+
 		final String methodName = node.get("methodName").asText();
 		AbstractClusteringMethodResponse response = null;
 		
@@ -63,8 +69,15 @@ public class ClusteringResponseDeserializer extends JsonDeserializer<AbstractClu
 	
 			case KMEANS:
 				
-				KmeansResponse kmeansResponse = new KmeansResponse();				
-				KmeansResult kmeansResult = oc.readValue(resultParser, KmeansResult.class);
+				KmeansResponse kmeansResponse = new KmeansResponse();
+				KmeansResult result = new KmeansResult();
+				//partialNode.get("centers");
+				//partialNode.get("clusters");
+				List<Map<String, String>> centers = mapper.readValue(partialNode.get("centers").asText() ,  new TypeReference<List<Map<String, String>>>(){});
+				Map<String,String> clusters =mapper.readValue(partialNode.get("clusters").asText() , new TypeReference<Map<String, String>>(){});
+				KmeansResult kmeansResult = new KmeansResult();
+				kmeansResult.setCenters(centers);
+				kmeansResult.setClusters(clusters);
 				kmeansResponse.setResult(kmeansResult);
 				
 				response = kmeansResponse;
@@ -73,8 +86,8 @@ public class ClusteringResponseDeserializer extends JsonDeserializer<AbstractClu
 			case AGNES:
 				
 				AgnesResponse agnesResponse = new AgnesResponse();
-				HierarchicalResult agnesResult = oc.readValue(resultParser, HierarchicalResult.class);
-				agnesResponse.setResult(agnesResult);
+				//HierarchicalResult agnesResult = oc.readValue(resultParser, HierarchicalResult.class);
+				//agnesResponse.setResult(agnesResult);
 				
 				response = agnesResponse;
 				break;
@@ -82,8 +95,8 @@ public class ClusteringResponseDeserializer extends JsonDeserializer<AbstractClu
 			case DIANA:
 				
 				DianaResponse dianaResponse = new DianaResponse();
-				HierarchicalResult dianaResult = oc.readValue(resultParser, HierarchicalResult.class);
-				dianaResponse.setResult(dianaResult);
+				//HierarchicalResult dianaResult = oc.readValue(resultParser, HierarchicalResult.class);
+				//dianaResponse.setResult(dianaResult);
 				
 				response = dianaResponse;
 				break;
@@ -91,8 +104,8 @@ public class ClusteringResponseDeserializer extends JsonDeserializer<AbstractClu
 			case PAM:
 				
 				PamResponse pamResponse = new PamResponse();
-				PamResult pamResult = oc.readValue(resultParser, PamResult.class);
-				pamResponse.setResult(pamResult);
+				//PamResult pamResult = oc.readValue(resultParser, PamResult.class);
+				//pamResponse.setResult(pamResult);
 				
 				response = pamResponse;
 				break;
@@ -100,8 +113,8 @@ public class ClusteringResponseDeserializer extends JsonDeserializer<AbstractClu
 			case CLARA:
 				
 				ClaraResponse claraResponse = new ClaraResponse();
-				ClaraResult claraResult = oc.readValue(resultParser, ClaraResult.class);
-				claraResponse.setResult(claraResult);
+				//ClaraResult claraResult = oc.readValue(resultParser, ClaraResult.class);
+				//claraResponse.setResult(claraResult);
 				
 				response = claraResponse;
 				break;

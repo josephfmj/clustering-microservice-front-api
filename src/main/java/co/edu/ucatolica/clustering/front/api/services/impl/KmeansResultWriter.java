@@ -69,7 +69,7 @@ public class KmeansResultWriter implements IClusteringResultWriter {
 		LOGGER.info("leyendo objeto KmeansResponse");
 		
 		this.kmeansResponse = (KmeansResponse) response;
-		
+
 		this.centerHeaders = MapRecordsUtil
 				.getHeaderFromMap(kmeansResponse.getResult().getCenters().get(0));
 		

@@ -15,6 +15,12 @@ public class MapRecordsUtil {
 		checkMapForEmpty(records);
 		return new ArrayList<String>(records.keySet());
 	}
+
+	public static List<String> getHeaderFromList(Map<String, String> records){
+
+		checkMapForEmpty(records);
+		return new ArrayList<String>(records.keySet());
+	}
 	
 	public static List<String> getRecordFromMap(Map<String, String> records, List<String> headers){
 		
